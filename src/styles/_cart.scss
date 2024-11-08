@@ -1,0 +1,33 @@
+.cart {
+    padding: 2rem 4rem;
+    @include flex(row, space-between, center, 4rem);
+    height: calc(100vh - 4rem);
+
+    >main {
+        width: 70%;
+
+        >h1 {
+            @include heading(2px);
+            text-align: center;
+        }
+
+        overflow-y: auto;
+
+        &::webkiit-Scrollbar {
+            display: none;
+        }
+    }
+
+    aside {
+        width: 30%;
+        padding: 4rem;
+        @include flex(column, center, stretch, 1.5rem);
+
+        >input {
+            padding: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.28);
+        }
+
+
+    }
+}

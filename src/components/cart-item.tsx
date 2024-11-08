@@ -1,11 +1,30 @@
-type CartItemsProps = {};
+import { FaTrash } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const CartItem = ({}:CartItemsProps) => {
+type CartItemsProps = {
+  cartItem: any;
+};
+
+const CartItem = ({ cartItem }: CartItemsProps) => {
+  const { productId, name, price, quantity, photo } = cartItem;
   return (
-    <div>
-      CartItems
-    </div>
-  )
-}
+    <div className="cart-item">
+      <img src={photo} alt={name} />
+      <article>
+        <Link to={`/product/${productId}`}>{name}</Link>
+        <span>₹{price}</span>
+      </article>
+      <div>
+        <button>-</button>
+        <p>{quantity}</p>
+        <button>+</button>
+      </div>
 
-export default CartItem
+      <button>
+        <FaTrash />
+      </button>
+    </div>
+  );
+};
+
+export default CartItem;
