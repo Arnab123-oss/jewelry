@@ -4,7 +4,7 @@ export interface User {
     email: string;
     photo: string;
     gender: string;
-    roll: string;
+    role: string;
     dob: string;
     _id: string;
 }
