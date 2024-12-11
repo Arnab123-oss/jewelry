@@ -16,9 +16,7 @@ export const userAPI = createApi({
                 url: "new",
                 method: "POST",
                 body: user,
-                // headers: {
-                //     'Content-Type': 'application/json'
-                // }
+
             })
         }),
     })

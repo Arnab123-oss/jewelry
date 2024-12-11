@@ -30,12 +30,12 @@ const Login = () => {
       });
 
       console.log(res);
-      
+
+      console.log(res);
 
       if ("data" in res) {
-        toast.success((res.data as MessageResponse)?.success);
+        toast.success((res.data as MessageResponse).message);
         // toast.success(res.data?.success)
-
       } else {
         const error = res.error as FetchBaseQueryError;
         const message = error.data as MessageResponse;

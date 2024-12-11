@@ -1,12 +1,29 @@
 import { useState } from "react";
 import ProductCard from "../components/product-card";
+import {
+  useCategoriesQuery,
+  useSearchProductsQuery,
+} from "../redux/api/productApi";
+import { CustomError } from "../types/api-types";
+import toast from "react-hot-toast";
 
 const Search = () => {
+  const {
+    data: categoriesResponse,
+    isLoading: loadingCategories,
+    isError,
+    error,
+  } = useCategoriesQuery("");
+
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
   const [maxPrice, setMaxPrice] = useState(1000);
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
+
+  const { isLoading: productLoading, data: serachedData } =
+    useSearchProductsQuery({ search, category, sort, page, price: maxPrice });
+  console.log(serachedData);
 
   // const handleSearchChange = (e) => {
   //   setSearch(e.target.value);
@@ -14,10 +31,10 @@ const Search = () => {
 
   const AddToCartHandlear = () => {};
 
+  const isPreviousPage = page > 1;
+  const isNextPage = page < 4;
 
-  const isPreviousPage = page>1;
-  const isNextPage = page<4;
-
+  if (isError) toast.error((error as CustomError).data.message);
 
   return (
     <div className="product-sarch-page">
@@ -51,11 +68,13 @@ const Search = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            <option value="">All</option>
-            <option value="">Sample1</option>
-            <option value="">Sample2</option>
-            {/* <option value="rating-asc">Rating: Low to High</option> */}
-            {/* <option value="rating-desc">Rating: High to Low</option> */}
+            <option value="">ALL</option>
+            {!loadingCategories &&
+              categoriesResponse?.categories.map((category) => (
+                <option key={category} value={category}>
+                  {category.toUpperCase()}
+                </option>
+              ))}
           </select>
         </div>
       </aside>
@@ -88,11 +107,21 @@ const Search = () => {
         </div>
 
         <article>
-          <button disabled={!isPreviousPage} onClick={() => setPage((prev) => prev - 1)}>prev</button>
+          <button
+            disabled={!isPreviousPage}
+            onClick={() => setPage((prev) => prev - 1)}
+          >
+            prev
+          </button>
           <span>
             {page} of {4}
           </span>
-          <button disabled={!isNextPage} onClick={() => setPage((prev) => prev + 1)}>next</button>
+          <button
+            disabled={!isNextPage}
+            onClick={() => setPage((prev) => prev + 1)}
+          >
+            next
+          </button>
         </article>
       </main>
     </div>
