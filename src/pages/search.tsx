@@ -6,6 +6,7 @@ import {
 } from "../redux/api/productApi";
 import { CustomError } from "../types/api-types";
 import toast from "react-hot-toast";
+import { Skeleton } from "../components/loader";
 
 const Search = () => {
   const {
@@ -17,13 +18,16 @@ const Search = () => {
 
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("");
-  const [maxPrice, setMaxPrice] = useState(1000);
+  const [maxPrice, setMaxPrice] = useState(2000);
   const [category, setCategory] = useState("");
   const [page, setPage] = useState(1);
 
-  const { isLoading: productLoading, data: serachedData } =
-    useSearchProductsQuery({ search, category, sort, page, price: maxPrice });
-  console.log(serachedData);
+  const {
+    isLoading: productLoading,
+    data: searchedData,
+    isError: productIsError,
+    error: productError,
+  } = useSearchProductsQuery({ search, category, sort, page, price: maxPrice });
 
   // const handleSearchChange = (e) => {
   //   setSearch(e.target.value);
@@ -32,9 +36,11 @@ const Search = () => {
   const AddToCartHandlear = () => {};
 
   const isPreviousPage = page > 1;
-  const isNextPage = page < 4;
+  const isNextPage = page < Number(searchedData?.totaPage);
 
   if (isError) toast.error((error as CustomError).data.message);
+
+  if (productIsError) toast.error((productError as CustomError).data.message);
 
   return (
     <div className="product-sarch-page">
@@ -56,7 +62,7 @@ const Search = () => {
           <input
             value={maxPrice}
             min={100}
-            max={1000}
+            max={2000}
             type="range"
             onChange={(e) => setMaxPrice(Number(e.target.value))}
           ></input>
@@ -87,42 +93,42 @@ const Search = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <div className="search-product-list">
-          <ProductCard
-            productId="4h4j74jh2"
-            name="Punjabi kalka design for men "
-            price={2543}
-            stock={254}
-            photo="https://i.pinimg.com/originals/a6/a1/dc/a6a1dc0f04d00cdcdbc1d89a0dad623c.jpg"
-            handler={AddToCartHandlear}
-          />
-          <ProductCard
-            productId="4h4j74jh2"
-            name="Punjabi kalka design for men "
-            price={2543}
-            stock={254}
-            photo="https://i.pinimg.com/originals/a6/a1/dc/a6a1dc0f04d00cdcdbc1d89a0dad623c.jpg"
-            handler={AddToCartHandlear}
-          />
-        </div>
-
-        <article>
-          <button
-            disabled={!isPreviousPage}
-            onClick={() => setPage((prev) => prev - 1)}
-          >
-            prev
-          </button>
-          <span>
-            {page} of {4}
-          </span>
-          <button
-            disabled={!isNextPage}
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            next
-          </button>
-        </article>
+        {productLoading ? (
+          <Skeleton />
+        ) : (
+          <div className="search-product-list">
+            {searchedData?.products.map((product) => (
+              <ProductCard
+                key={product._id}
+                productId={product._id}
+                name={product.name}
+                price={product.price}
+                stock={product.stock}
+                photo={product.photo}
+                handler={AddToCartHandlear}
+              />
+            ))}
+          </div>
+        )}
+        {searchedData && searchedData.totaPage > 1 && (
+          <article>
+            <button
+              disabled={!isPreviousPage}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              prev
+            </button>
+            <span>
+              {page} of {searchedData.totaPage}
+            </span>
+            <button
+              disabled={!isNextPage}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              next
+            </button>
+          </article>
+        )}
       </main>
     </div>
   );

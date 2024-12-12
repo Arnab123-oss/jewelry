@@ -39,9 +39,15 @@ export type SearchProductResponse = {
 }
 
 export type SearchProductRequest = {
-    price:number;
+    price: number;
     page: number
     category: string
     search: string
     sort: string
+}
+
+
+export type NewProductRequest = {
+    id: string;
+    formdata: FormData
 }
