@@ -47,7 +47,25 @@ export type SearchProductRequest = {
 }
 
 
+export type ProductDetailsResponse = {
+    success: boolean;
+    product: Product;
+}
+
+
 export type NewProductRequest = {
     id: string;
     formdata: FormData
+}
+
+
+export type UpdateProductRequest = {
+    userId: string;
+    productId: string;
+    formdata: FormData;
+}
+
+export type DeleteProductRequest = {
+    userId: string;
+    productId: string;
 }
