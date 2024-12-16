@@ -17,7 +17,7 @@ const Home = () => {
 
     dispatch(addToCart(cartItem));
 
-    toast.success("Product added to cart");
+    toast.success("Added to cart");
   };
 
   if (isError)
