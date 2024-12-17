@@ -1,8 +1,14 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Column } from "react-table";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
+import { useSelector } from "react-redux";
+import { userReducerInitialState } from "../../types/reducer-types";
+import { useAllOrdersQuery } from "../../redux/api/orderApi";
+import { CustomError } from "../../types/api-types";
+import toast from "react-hot-toast";
+import { server } from "../../redux/store";
 
 interface DataType {
   user: string;
@@ -69,6 +75,30 @@ const columns: Column<DataType>[] = [
 ];
 
 const Transaction = () => {
+  const { user } = useSelector(
+    (state: { userReducer: userReducerInitialState }) => state.userReducer
+  );
+
+  const {data,isLoading,isError,error} = useAllOrdersQuery(user?._id ?? "");
+
+  if (isError) toast.error((error as CustomError).data.message);
+
+    useEffect(() => {
+     
+      if (data?.orders && Array.isArray(data.orders)) {
+        setRows(
+          data.orders.map((i) => ({
+            user: i.user.name,
+            amount: i.total,
+            discount:i.discount, 
+            quantity:i.orderitems.length,
+            status:<span className={i.status==="Processing"?"red":""}>{i.status}</span>,
+            action: <Link to={`/admin/transaction/${i._id}`}>Manage</Link>,
+          }))
+        );
+      }
+    }, [data]);
+
   const [rows, setRows] = useState<DataType[]>(arr);
 
   const Table = TableHOC<DataType>(
