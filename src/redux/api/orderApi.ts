@@ -29,7 +29,7 @@ export const orderAPI = createApi({
         deleteOrder: builder.mutation<MessageResponse, UpdateOrderRequest>({
             query: ({ userId, orderId }) => ({
                 url: `${orderId}?id=${userId}`,
-                method: "PUT",
+                method: "DELETE",
 
             }),
             invalidatesTags: ["orders"],

@@ -3,12 +3,12 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { useCreateProductMutation } from "../../../redux/api/productApi";
-import { userReducerInitialState } from "../../../types/reducer-types";
+import { RootState } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
 
 const NewProduct = () => {
   const { user } = useSelector(
-    (state: { userReducer: userReducerInitialState }) => state.userReducer
+    (state: RootState) => state.userReducer
   );
 
   const [name, setName] = useState<string>("");

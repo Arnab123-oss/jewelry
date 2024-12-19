@@ -25,7 +25,7 @@ export type ShippingInfo = {
     city: string;
     state: string;
     country: string;
-    pincode: string;
+    pinCode: string;
 
 }
 
@@ -42,14 +42,14 @@ export type cartItem = {
 export type orderItem = Omit<cartItem, "stock"> & { _id: string }
 
 export type Order = {
-    orderitems: orderItem[];
+    orderItems: orderItem[];
     shippingInfo: ShippingInfo
     subtotal: number;
     tax: number;
     shippingCharges: number;
     discount: number;
     total: number;
-    status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+    status: string;
     user: {
         name: string,
         _id: string;

@@ -1,4 +1,6 @@
+import { signOut } from "firebase/auth";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import {
   FaSearch,
   FaShoppingBag,
@@ -6,13 +8,11 @@ import {
   FaSignOutAlt,
   FaUser,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { User } from "../types/types";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
-import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { cartReducerInitialState } from "../types/reducer-types";
+import { Link } from "react-router-dom";
+import { auth } from "../firebase";
+import { RootState } from "../redux/store";
+import { User } from "../types/types";
 
 interface PropsType {
   user: User | null;
@@ -22,7 +22,7 @@ const Header = ({ user }: PropsType) => {
 
   const { cartItems} =
   useSelector(
-    (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+    (state: RootState) => state.cartReducer
   );
 
 

@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { Skeleton } from "../../../components/loader";
 import {
@@ -9,8 +9,7 @@ import {
   useProductDetailsQuery,
   useUpdateProductMutation,
 } from "../../../redux/api/productApi";
-import { server } from "../../../redux/store";
-import { userReducerInitialState } from "../../../types/reducer-types";
+import { RootState, server } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
 
 // const img =
@@ -18,13 +17,13 @@ import { responseToast } from "../../../utils/features";
 
 const Productmanagement = () => {
   const { user } = useSelector(
-    (state: { userReducer: userReducerInitialState }) => state.userReducer
+    (state: RootState) => state.userReducer
   );
 
   const params = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading } = useProductDetailsQuery(params.id!);
+  const { data, isLoading,isError } = useProductDetailsQuery(params.id!);
 
   const { name, price, stock, category, photo } = data?.product || {
     name: "",
@@ -116,6 +115,8 @@ const Productmanagement = () => {
       setCategoryUpdate(data.product.category);
     }
   }, [data]);
+
+  if (isError) return <Navigate to={"/404"} />;
 
   return (
     <div className="admin-container">

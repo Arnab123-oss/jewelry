@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { VscError } from "react-icons/vsc";
@@ -10,17 +11,15 @@ import {
   discountApplied,
   removeCartItem,
 } from "../redux/reducer/cartReducer";
-import { cartReducerInitialState } from "../types/reducer-types";
+import { RootState, server } from "../redux/store";
 import { cartItem } from "../types/types";
-import axios from "axios";
-import { server } from "../redux/store";
 
 const Cart = () => {
   const dispatch = useDispatch();
 
   const { cartItems, subtotal, tax, total, shippingCharges, discount } =
     useSelector(
-      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
+      (state: RootState) => state.cartReducer
     );
 
   const [cuponCode, setCuponCode] = useState<string>("");

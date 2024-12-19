@@ -1,17 +1,18 @@
+import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { BiArrowBack } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { cartReducerInitialState } from "../types/reducer-types";
-import { useSelector } from "react-redux";
+import { saveShippingInfo } from "../redux/reducer/cartReducer";
+import { RootState, server } from "../redux/store";
 
 const Shipping = () => {
+  const { cartItems, total } = useSelector(
+    (state: RootState) => state.cartReducer
+  );
 
-  const { cartItems } =
-    useSelector(
-      (state: { cartReducer: cartReducerInitialState }) => state.cartReducer
-    );
-
-    // , subtotal, tax, total, shippingCharges, discount
+  // , subtotal, tax, total, shippingCharges, discount
 
   const [shippingInfo, setShippingInfo] = useState({
     address: "",
@@ -21,6 +22,8 @@ const Shipping = () => {
     pinCode: "",
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const changeHandler = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -28,20 +31,42 @@ const Shipping = () => {
   };
 
   useEffect(() => {
-    if(cartItems.length <=0) return navigate("/cart")
-   
-  }, [cartItems,navigate])
-  
+    if (cartItems.length <= 0) return navigate("/cart");
+  }, [cartItems, navigate]);
 
-  
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    dispatch(saveShippingInfo(shippingInfo));
+
+    try {
+      const { data } = await axios.post(
+        `${server}/api/v1/payment/create`,
+        {
+          amount: total,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      navigate("/pay", {
+        state: data.clientSecret,
+      });
+    } catch (error) {
+      console.log(error);
+
+      toast.error("Failed to process your order. Please try again later.");
+      // navigate("/cart");
+    }
+  };
 
   return (
     <div className="shipping">
-      <button className="back-btn" onClick={()=>navigate("/cart")}>
+      <button className="back-btn" onClick={() => navigate("/cart")}>
         <BiArrowBack />
       </button>
 
-      <form>
+      <form onSubmit={submitHandler}>
         <h1>Shipping Information</h1>
 
         <input

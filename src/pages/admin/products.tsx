@@ -8,9 +8,8 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
 import { Skeleton } from "../../components/loader";
 import { useAllProductsQuery } from "../../redux/api/productApi";
-import { server } from "../../redux/store";
+import { RootState, server } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
-import { userReducerInitialState } from "../../types/reducer-types";
 
 interface DataType {
   photo: ReactElement;
@@ -45,7 +44,7 @@ const columns: Column<DataType>[] = [
 
 const Products = () => {
   const { user } = useSelector(
-    (state: { userReducer: userReducerInitialState }) => state.userReducer
+    (state: RootState) => state.userReducer
   );
   const { data, isError, isLoading, error } = useAllProductsQuery(
     user?._id ?? ""
