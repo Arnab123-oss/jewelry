@@ -57,3 +57,78 @@ export type Order = {
     _id: string;
 
 }
+
+type CountAndChange = {
+    revenue: number;
+    product: number;
+    user: number;
+    order: number;
+}
+
+type LatestTransaction = {
+    _id: string;
+    discount: number;
+    amount: number;
+    quantity: number;
+    status: string;
+}
+
+export type Stats = {
+    categoryCount: Record<string, number>[],
+    changePercent: CountAndChange;
+    count: CountAndChange;
+    userRatio: {
+        male: number;
+        female: number;
+    },
+    latestTransction: LatestTransaction[],
+    chart: {
+        order: number[],
+        revenue: number[],
+    }
+}
+
+
+export type Pie = {
+    orderFulfilment: {
+        processing: number;
+        shipped: number;
+        delivered: number;
+    };
+    productCategories: Record<string, number>[];
+    stockAvailablity: {
+        inStock: number;
+        outOfStock: number;
+    };
+    revenueDistribution: {
+        netMargin: number;
+        discount: number;
+        productionCost: number;
+        burnt: number;
+        marketingCost: number;
+    };
+    adminCustomer: {
+        admin: number;
+        customer: number;
+    };
+    usersAgeGroup: {
+        teen: number;
+        adult: number;
+        old: number;
+    };
+}
+
+export type Bar = {
+    products: number[];
+    users: number[];
+    orders: number[];
+}
+
+export type Line = {
+    products: number[];
+    users: number[];
+    discount: number[];
+    revenue: number[];
+}
+
+
