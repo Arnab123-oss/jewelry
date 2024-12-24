@@ -1,16 +1,16 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
-import { lazy, Suspense, useEffect } from "react";
-import Loader from "./components/loader";
-import Header from "./components/header";
-import { Toaster } from "react-hot-toast";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebase";
-import { userExist, userNotExist } from "./redux/reducer/userReducer";
+import { lazy, Suspense, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "./redux/api/userApi";
-import { userReducerInitialState } from "./types/reducer-types";
+import Header from "./components/header";
+import Loader from "./components/loader";
 import ProtectedRoute from "./components/protected-route";
+import { auth } from "./firebase";
+import { getUser } from "./redux/api/userApi";
+import { userExist, userNotExist } from "./redux/reducer/userReducer";
+import { userReducerInitialState } from "./types/reducer-types";
 
 const Home = lazy(() => import("./pages/home"));
 const Search = lazy(() => import("./pages/search"));
@@ -20,11 +20,7 @@ const Login = lazy(() => import("./pages/login"));
 const Orders = lazy(() => import("./pages/order"));
 const OrderDetails = lazy(() => import("./pages/order-details"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Checkout = lazy(() => import("./pages/checkout"));
-
-
-
-
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 //Admin Routes Importing
 
@@ -89,7 +85,6 @@ const App = () => {
             <Route path="/orders" element={<Orders />} />
             <Route path="/order/:id" element={<OrderDetails />} />
             <Route path="/pay" element={<Checkout />} />
-
           </Route>
           {/* Admin Routes */}
           <Route
@@ -121,7 +116,7 @@ const App = () => {
               element={<TransactionManagement />}
             />
           </Route>
-          <Route path="*" element={<NotFound/>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
       <Toaster position="bottom-center" />
