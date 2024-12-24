@@ -1,4 +1,4 @@
-import { Bar, cartItem, Order, Pie, Product, ShippingInfo, Stats, User } from "./types";
+import { Bar, cartItem, Line, Order, Pie, Product, ShippingInfo, Stats, User } from "./types";
 
 
 export type CustomError = {
@@ -72,7 +72,7 @@ export type BarResponse = {
 
 export type LineResponse = {
     success: boolean;
-    charts: Bar;
+    charts: Line;
 }
 
 export type NewProductRequest = {

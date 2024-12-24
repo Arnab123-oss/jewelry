@@ -62,4 +62,16 @@ export const getLastMonths = () => {
         lastTwelveMonths,
     }
 
+    // const currentDate = moment().date(1);
+
+    // const getLastMonthsArray = (count: number) => 
+    //     Array.from({ length: count }, (_, i) =>
+    //         currentDate.clone().subtract(i, "months").format("MMMM")
+    //     ).reverse();
+
+    // return {
+    //     lastSixMonths: getLastMonthsArray(6),
+    //     lastTwelveMonths: getLastMonthsArray(12),
+    // }
+
 }
