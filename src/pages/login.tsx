@@ -1,16 +1,19 @@
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { FcGoogle } from "react-icons/fc";
+import { useDispatch } from "react-redux";
 import { auth } from "../firebase";
-import { useLoginMutation } from "../redux/api/userApi";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+import { getUser, useLoginMutation } from "../redux/api/userApi";
+import { userExist, userNotExist } from "../redux/reducer/userReducer";
 import { MessageResponse } from "../types/api-types";
-import { Navigate } from "react-router-dom";
 
 const Login = () => {
   const [gender, setGender] = useState("");
   const [date, setDate] = useState("");
+
+  const dispatch = useDispatch();
 
   const [login] = useLoginMutation();
 
@@ -32,11 +35,13 @@ const Login = () => {
 
       if ("data" in res) {
         toast.success((res.data as MessageResponse).message);
-        <Navigate to={"/"} />;
+        const data = await getUser(user.uid);
+        dispatch(userExist(data!.user));
       } else {
         const error = res.error as FetchBaseQueryError;
         const message = error.data as MessageResponse;
         toast.error(message.message);
+        dispatch(userNotExist());
       }
 
       // console.log(user);
