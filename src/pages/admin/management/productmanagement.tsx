@@ -9,25 +9,24 @@ import {
   useProductDetailsQuery,
   useUpdateProductMutation,
 } from "../../../redux/api/productApi";
-import { RootState, server } from "../../../redux/store";
+import { RootState } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
+import { ImSpinner } from "react-icons/im";
 
 // const img =
 //   "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvZXN8ZW58MHx8MHx8&w=1000&q=804";
 
 const Productmanagement = () => {
-  const { user } = useSelector(
-    (state: RootState) => state.userReducer
-  );
+  const { user } = useSelector((state: RootState) => state.userReducer);
 
   const params = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading,isError } = useProductDetailsQuery(params.id!);
+  const { data, isLoading, isError } = useProductDetailsQuery(params.id!);
 
-  const { name, price, stock, category, photo } = data?.product || {
+  const { name, price, stock, category, photos } = data?.product || {
     name: "",
-    photo: "",
+    photos: [""],
     category: "",
     stock: 0,
     price: 0,
@@ -43,43 +42,58 @@ const Productmanagement = () => {
   const [stockUpdate, setStockUpdate] = useState<number>(stock);
   const [nameUpdate, setNameUpdate] = useState<string>(name);
   const [categoryUpdate, setCategoryUpdate] = useState<string>(category);
-  const [photoUpdate, setPhotoUpdate] = useState<string>("");
-  const [photoFile, setPhotoFile] = useState<File>();
+  const [photoUpdate, setPhotoUpdate] = useState<string[]>([]);
+  const [photoFile, setPhotoFile] = useState<File[]>([]);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const [updateProduct] = useUpdateProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
   const changeImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const file: File | undefined = e.target.files?.[0];
+    const files = e.target.files;
 
-    const reader: FileReader = new FileReader();
+    if (files) {
+      const previews: string[] = [];
+      const fileArray: File[] = [];
 
-    if (file) {
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setPhotoUpdate(reader.result);
-          setPhotoFile(file);
-        }
-      };
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            previews.push(reader.result);
+            fileArray.push(file);
+
+            if (previews.length === files.length) {
+              setPhotoUpdate(previews);
+              setPhotoFile(fileArray);
+            }
+          }
+        };
+      });
     }
   };
-
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsProcessing(true);
     const formdata = new FormData();
     if (nameUpdate) formdata.set("name", nameUpdate);
     if (priceUpdate) formdata.set("price", priceUpdate.toString());
     if (stockUpdate !== undefined)
       formdata.set("stock", stockUpdate.toString());
     if (categoryUpdate) formdata.set("category", categoryUpdate);
-    if (photoFile) formdata.set("photo", photoFile);
+    if (photoFile)
+      photoFile.forEach((photo) => {
+        formdata.append("photos", photo); // Append multiple photos
+      });
 
     const res = await updateProduct({
       formdata,
       userId: userId!,
       productId: productId!,
     });
+
+    if (res.data?.message || res.error) setIsProcessing(false);
 
     responseToast(res, navigate, "/admin/product");
 
@@ -91,11 +105,14 @@ const Productmanagement = () => {
   };
 
   const deleteHandler = async () => {
+    setIsProcessing(true);
 
     const res = await deleteProduct({
       userId: userId!,
       productId: productId!,
     });
+
+    if (res.data?.message || res.error) setIsProcessing(false);
 
     responseToast(res, navigate, "/admin/product");
 
@@ -105,7 +122,6 @@ const Productmanagement = () => {
     //   productId: data?.product._id,
     // });
   };
-
 
   useEffect(() => {
     if (data) {
@@ -128,7 +144,7 @@ const Productmanagement = () => {
           <>
             <section>
               <strong>ID - {data?.product._id}</strong>
-              <img src={`${server}/${photo}`} alt="Product" />
+              <img src={photos[0]} alt="Product" />
               <p>{name}</p>
               {stock > 0 ? (
                 <span className="green">{stock} Available</span>
@@ -186,8 +202,25 @@ const Productmanagement = () => {
                   <input type="file" onChange={changeImageHandler} />
                 </div>
 
-                {photoUpdate && <img src={photoUpdate} alt="New Image" />}
-                <button type="submit">Update</button>
+                {photoUpdate.length > 0 && (
+                  <div className="photo-previews">
+                    {photoUpdate.map((preview, index) => (
+                      <img
+                        key={index}
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        style={{ width: "50px", margin: "5px" }}
+                      />
+                    ))}
+                  </div>
+                )}
+                <button type="submit">
+                  {isProcessing ? (
+                    <ImSpinner className="loading-icon" />
+                  ) : (
+                    "Update"
+                  )}
+                </button>
               </form>
             </article>
           </>

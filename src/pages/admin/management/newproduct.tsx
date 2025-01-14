@@ -5,56 +5,70 @@ import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { useCreateProductMutation } from "../../../redux/api/productApi";
 import { RootState } from "../../../redux/store";
 import { responseToast } from "../../../utils/features";
+import { ImSpinner } from "react-icons/im";
 
 const NewProduct = () => {
-  const { user } = useSelector(
-    (state: RootState) => state.userReducer
-  );
+  const { user } = useSelector((state: RootState) => state.userReducer);
 
   const [name, setName] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [price, setPrice] = useState<number>(1000);
   const [stock, setStock] = useState<number>(1);
-  const [photoPrev, setPhotoPrev] = useState<string>("");
-  const [photo, setPhoto] = useState<File>();
+  const [photoPrev, setPhotoPrev] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const [newProduct] = useCreateProductMutation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const changeImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const file: File | undefined = e.target.files?.[0];
+    const files = e.target.files;
 
-    const reader: FileReader = new FileReader();
+    if (files) {
+      const previews: string[] = [];
+      const fileArray: File[] = [];
 
-    if (file) {
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setPhotoPrev(reader.result);
-          setPhoto(file);
-        }
-      };
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            previews.push(reader.result);
+            fileArray.push(file);
+
+            if (previews.length === files.length) {
+              setPhotoPrev(previews);
+              setPhotos(fileArray);
+            }
+          }
+        };
+      });
     }
   };
   // : Promise<void>
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name || !price || !stock || !photo || !category) return;
-
+    if (!name || !price || !stock || !photos || !category) return;
+    setIsProcessing(true);
     const formData = new FormData();
     formData.set("name", name);
     formData.set("category", category);
     formData.set("stock", stock.toString());
     formData.set("price", price.toString());
-    formData.set("photo", photo);
+    photos.forEach((photo) => {
+      formData.append("photos", photo); // Append multiple photos
+    });
 
     let userId;
     if (user) userId = user._id;
 
     const res = await newProduct({ id: userId!, formdata: formData });
+    console.log(res);
 
-    responseToast(res,navigate,"/admin/product")
+    if (res.data?.message || res.error) setIsProcessing(false);
+
+    responseToast(res, navigate, "/admin/product");
   };
 
   return (
@@ -108,11 +122,29 @@ const NewProduct = () => {
 
             <div>
               <label>Photo</label>
-              <input required type="file" onChange={changeImageHandler} />
+              <input
+                required
+                type="file"
+                multiple
+                onChange={changeImageHandler}
+              />
             </div>
 
-            {photoPrev && <img src={photoPrev} alt="New Image" />}
-            <button type="submit">Create</button>
+            {photoPrev.length > 0 && (
+              <div className="photo-previews">
+                {photoPrev.map((preview, index) => (
+                  <img
+                    key={index}
+                    src={preview}
+                    alt={`Preview ${index + 1}`}
+                    style={{ width: "50px", margin: "5px" }}
+                  />
+                ))}
+              </div>
+            )}
+            <button type="submit">
+              {isProcessing ? <ImSpinner className="loading-icon" /> : "Create"}
+            </button>
           </form>
         </article>
       </main>

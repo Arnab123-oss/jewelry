@@ -3,15 +3,20 @@ import { cartReducerInitialState } from "../../types/reducer-types";
 import { cartItem, ShippingInfo } from "../../types/types";
 
 
+const savedCartItems = localStorage.getItem("cartItems");
+const savedShippingInfo = localStorage.getItem("shippingInfo");
+
 const initialState: cartReducerInitialState = {
     loading: false,
-    cartItems: [],
+    cartItems: savedCartItems ? JSON.parse(savedCartItems) : [],
     subtotal: 0,
     tax: 0,
     shippingCharges: 0,
     discount: 0,
     total: 0,
-    shippingInfo: {
+    shippingInfo: savedShippingInfo
+    ? JSON.parse(savedShippingInfo)
+    :  {
         address: "",
         city: "",
         state: "",
@@ -35,14 +40,15 @@ export const cartReducer = createSlice({
 
             state.loading = false;
 
+           localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
+
         },
         removeCartItem: (state, action: PayloadAction<string>) => {
             state.loading = true;
             state.cartItems = state.cartItems.filter((i) => i.productId !== action.payload);
             state.loading = false;
+            localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
         },
-
-
 
         calculatePrice: (state) => {
             const subtotal = state.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0)
@@ -67,8 +73,27 @@ export const cartReducer = createSlice({
 
         saveShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
             state.shippingInfo = action.payload;
+
+            localStorage.setItem("shippingInfo", JSON.stringify(state.shippingInfo));
         },
-        resetCart: () => initialState
+        resetCart: (state) => {
+            // Clear cart and localStorage
+            state.cartItems = [];
+            state.subtotal = 0;
+            state.tax = 0;
+            state.shippingCharges = 0;
+            state.discount = 0;
+            state.total = 0;
+            state.shippingInfo = {
+                address: "",
+                city: "",
+                state: "",
+                country: "",
+                pinCode: "",
+            };
+            localStorage.removeItem("cartItems");
+            localStorage.removeItem("shippingInfo");
+        },
 
 
     },

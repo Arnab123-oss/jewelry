@@ -8,7 +8,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
 import { Skeleton } from "../../components/loader";
 import { useAllProductsQuery } from "../../redux/api/productApi";
-import { RootState, server } from "../../redux/store";
+import { RootState } from "../../redux/store";
 import { CustomError } from "../../types/api-types";
 
 interface DataType {
@@ -61,7 +61,7 @@ const Products = () => {
     if (data?.products && Array.isArray(data.products)) {
       setRows(
         data.products.map((i) => ({
-          photo: <img src={`${server}/${i.photo}`} />,
+          photo: <img src={i.photos[0]} />,
           name: i.name,
           price: i.price,
           stock: i.stock,
